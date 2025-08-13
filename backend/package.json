@@ -1,0 +1,40 @@
+{
+  "name": "flagright-relationship-visualizer",
+  "version": "1.0.0",
+  "description": "A prototype system to visualize relationships between user accounts using transaction data and shared attributes in a graph database environment",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon ./src/server.js",
+    "load-sample-data": "node src/scripts/sampleData.js",
+    "docker:build": "docker build -t flagright-api .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "graph-database",
+    "neo4j",
+    "relationship-detection",
+    "fraud-detection",
+    "transaction-analysis",
+    "flagright"
+  ],
+  "author": "Anurag Asawa",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "neo4j-driver": "^5.28.1",
+    "node": "^22.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

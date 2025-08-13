@@ -1,0 +1,128 @@
+services:
+  # Neo4j Database
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: flagright-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/flagright123
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
+    ports:
+      - "7474:7474" # HTTP - Neo4j Browser
+      - "7687:7687" # Bolt - Database connection
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+      - neo4j_plugins:/plugins
+    networks:
+      - flagright-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:7474/browser/",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flagright-backend
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - NEO4J_URI=neo4j://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=flagright123
+      - CORS_ORIGIN=http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - flagright-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: flagright-frontend
+    ports:
+      - "3001:3001"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - flagright-network
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  # Data Initialization Service (runs once on startup)
+  data-init:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flagright-data-init
+    environment:
+      - NODE_ENV=development
+      - NEO4J_URI=neo4j://neo4j:7687
+      - NEO4J_USERNAME=neo4j
+      - NEO4J_PASSWORD=flagright123
+      - AUTO_LOAD_SAMPLE_DATA=true
+    command: ["node", "src/scripts/sampleData.js"]
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - flagright-network
+    restart: "no"
+
+volumes:
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+  neo4j_import:
+    driver: local
+  neo4j_plugins:
+    driver: local
+
+networks:
+  flagright-network:
+    driver: bridge
