@@ -1,0 +1,30 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cytoscape": "^3.33.1",
+    "web-vitals": "^2.1.4",
+    "http-server": "^14.1.1"
+  },
+  "scripts": {
+    "start": "http-server -p 3001 -c-1 --cors",
+    "dev": "http-server -p 3001 -c-1 --cors",
+    "build": "echo 'No build step needed for static files'",
+    "test": "echo 'No tests configured'"
+  },
+  "eslintConfig": {},
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

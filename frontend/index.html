@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flagright - Relationship Visualization System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-project-diagram"></i> Flagright Relationship Visualizer</h1>
+            <nav class="nav">
+                <button class="nav-btn active" data-section="graph-explorer">Graph Explorer</button>
+                <button class="nav-btn" data-section="transaction-relationships">Transaction Relationships</button>
+            </nav>
+        </header>
+
+        <!-- Graph Explorer Section -->
+        <section id="graph-explorer" class="section active">
+            <div class="section-header">
+                <h2><i class="fas fa-project-diagram"></i> Graph Explorer</h2>
+                <div class="export-controls">
+                    <button class="export-btn" onclick="exportGraphData('csv')">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <button class="export-btn" onclick="exportGraphData('json')">
+                        <i class="fas fa-file-code"></i> Export JSON
+                    </button>
+                </div>
+            </div>
+
+            <div class="explorer-layout">
+                <!-- Left Sidebar - Users and Transactions -->
+                <div class="explorer-sidebar">
+                    <!-- Users Section -->
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-users"></i> Users</h3>
+                        <div class="search-container">
+                            <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                        </div>
+                        <div class="filter-container">
+                            <select id="userFilter" class="filter-select">
+                                <option value="">All Risk Levels</option>
+                                <option value="low">Low Risk</option>
+                                <option value="medium">Medium Risk</option>
+                                <option value="high">High Risk</option>
+                            </select>
+                        </div>
+                        <div class="entity-list" id="usersList">
+                            <!-- Users will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Transactions Section -->
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-exchange-alt"></i> Transactions</h3>
+                        <div class="search-container">
+                            <input type="text" id="transactionSearch" placeholder="Search transactions..."
+                                class="search-input">
+                        </div>
+                        <div class="filter-container">
+                            <select id="transactionFilter" class="filter-select">
+                                <option value="">All Categories</option>
+                                <option value="food">Food</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="education">Education</option>
+                                <option value="work">Work</option>
+                                <option value="personal">Personal</option>
+                            </select>
+                        </div>
+                        <div class="entity-list" id="transactionsList">
+                            <!-- Transactions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Interactive Graph -->
+                <div class="explorer-main">
+                    <div class="graph-controls">
+                        <button class="btn btn-secondary" onclick="resetGraph()">
+                            <i class="fas fa-home"></i> Reset View
+                        </button>
+                        <button class="btn btn-secondary" onclick="fitGraph()">
+                            <i class="fas fa-expand"></i> Fit to Screen
+                        </button>
+                        <button id="refreshRelationshipsBtn" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> Refresh Relationships
+                        </button>
+                    </div>
+                    <div id="explorerGraph" class="explorer-graph"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transaction Relationships Section -->
+        <section id="transaction-relationships" class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-link"></i> Transaction Relationships</h2>
+                <div class="relationship-controls">
+                    <button class="btn btn-primary" onclick="loadTransactionRelationshipsFromInput()">
+                        <i class="fas fa-search"></i> Load Relationships
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearTransactionRelationships()">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="relationship-layout">
+                <!-- Left Panel - Transaction Input and Summary -->
+                <div class="relationship-sidebar">
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-search"></i> Search Transaction</h3>
+                        <div class="search-container">
+                            <input type="text" id="transactionIdInput"
+                                placeholder="Enter transaction ID (e.g., txn-015)" class="search-input">
+                        </div>
+                        <div class="search-actions">
+                            <button class="btn btn-primary" onclick="loadTransactionRelationshipsFromInput()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadDemoTransaction()">
+                                <i class="fas fa-play"></i> Demo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-info-circle"></i> Relationship Summary</h3>
+                        <div id="relationshipSummary" class="summary-content">
+                            <p class="placeholder-text">Enter a transaction ID to see shared attributes and
+                                relationships</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Relationship Visualization -->
+                <div class="relationship-main">
+                    <div class="relationship-controls">
+                        <button class="btn btn-secondary" onclick="resetTransactionGraph()">
+                            <i class="fas fa-home"></i> Reset View
+                        </button>
+                        <button class="btn btn-secondary" onclick="fitTransactionGraph()">
+                            <i class="fas fa-expand"></i> Fit to Screen
+                        </button>
+                    </div>
+                    <div id="transactionRelationshipGraph" class="relationship-graph"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content detail-modal">
+            <span class="close" onclick="closeDetailModal()">&times;</span>
+            <div id="detailContent">
+                <!-- Details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
