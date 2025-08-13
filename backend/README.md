@@ -350,18 +350,6 @@ docker exec -it flagright-neo4j cypher-shell -u neo4j -p password123
 - **Caching**: Implement Redis for frequently accessed data
 - **Monitoring**: Add application performance monitoring (APM)
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-ISC License - see LICENSE file for details
-
 ## 🆘 Troubleshooting
 
 ### Neo4j Connection Issues
