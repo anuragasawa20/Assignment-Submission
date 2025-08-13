@@ -13,7 +13,9 @@ A comprehensive system for visualizing relationships between user accounts using
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd Flagright
+cd Assignment-Submission
+
+- Start Docker Daemon
 
 # Start all services
 ./start-dev.sh
