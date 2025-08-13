@@ -139,8 +139,8 @@ curl -X DELETE http://localhost:3000/api/data/clear
 ```
 
 ### Sample Data Includes
-- **Users**: 50+ sample users with realistic profiles
-- **Transactions**: 100+ financial transactions
+- **Users**: 15 sample users with realistic profiles
+- **Transactions**: 10+ financial transactions
 - **Relationships**: Shared emails, phones, addresses, devices
 - **Risk Patterns**: Various risk levels and suspicious activities
 
@@ -291,12 +291,6 @@ curl http://localhost:3000/users
 - **Custom Algorithms**: User-defined relationship detection
 - **Data Connectors**: Integration with external data sources
 - **Reporting Engine**: Advanced reporting and analytics
-
-## 📝 License
-
-This project is licensed under the ISC License.
-
-## 🤝 Contributing
 
 ### Development Guidelines
 1. **Follow modular architecture**: Keep modules focused and independent
