@@ -73,6 +73,8 @@ export default function createContainer() {
         const allowedOrigins = [
             'http://localhost:3001',
             'http://localhost:5500',
+            'https://flagrighttaskfrontend.vercel.app/',
+            'https://flagrighttaskfrontend.vercel.app',
             process.env.CORS_ORIGIN  // Production frontend URL
         ].filter(Boolean);  // Remove undefined values
 
