@@ -136,6 +136,8 @@ export function showNodeDetails(nodeData) {
 
     if (nodeData.type === 'user') {
         content.innerHTML = generateUserDetails(nodeData);
+    } else if (nodeData.type === 'transaction' || nodeData.type === 'main-transaction') {
+        content.innerHTML = generateTransactionDetails(nodeData);
     }
 
     modal.style.display = 'block';
@@ -210,6 +212,89 @@ function generateUserDetails(user) {
                 <span class="detail-value metadata">${JSON.stringify(user.metadata || {}, null, 2)}</span>
             </div>
         </div>
+    `;
+}
+
+function generateTransactionDetails(transaction) {
+    const amount = transaction.amount || 0;
+    const description = transaction.description || 'N/A';
+    const status = transaction.status || 'N/A';
+    const currency = transaction.currency || 'USD';
+    const ipAddress = transaction.ipAddress || 'N/A';
+    const deviceId = transaction.deviceId || 'N/A';
+    const timestamp = transaction.timestamp || transaction.createdAt || null;
+
+    return `
+        <div class="detail-section">
+            <h4><i class="fas fa-exchange-alt"></i> Transaction Information</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Transaction ID</span>
+                    <span class="detail-value">${transaction.id}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value">$${amount} ${currency}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value">${description}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value status-badge ${status.toLowerCase()}">${status}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Type</span>
+                    <span class="detail-value">${transaction.type || 'TRANSFER'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h4><i class="fas fa-network-wired"></i> Technical Details</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">IP Address</span>
+                    <span class="detail-value">${ipAddress}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Device ID</span>
+                    <span class="detail-value">${deviceId}</span>
+                </div>
+                ${timestamp ? `
+                <div class="detail-item">
+                    <span class="detail-label">Timestamp</span>
+                    <span class="detail-value">${formatDate(timestamp)}</span>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+        
+        ${transaction.fromUserId && transaction.toUserId ? `
+        <div class="detail-section">
+            <h4><i class="fas fa-users"></i> Transaction Flow</h4>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">From User</span>
+                    <span class="detail-value">${transaction.fromUserId}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">To User</span>
+                    <span class="detail-value">${transaction.toUserId}</span>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+        
+        ${transaction.metadata ? `
+        <div class="detail-section">
+            <h4><i class="fas fa-cog"></i> Metadata</h4>
+            <div class="detail-item">
+                <span class="detail-value metadata">${JSON.stringify(transaction.metadata || {}, null, 2)}</span>
+            </div>
+        </div>
+        ` : ''}
     `;
 }
 

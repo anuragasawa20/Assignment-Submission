@@ -1,5 +1,5 @@
 // Transaction Graph module - handles the transaction relationship graph (transactionRelationshipCy)
-import { showMessage, showLoadingIndicator, hideLoadingIndicator } from './ui.js';
+import { showMessage, showLoadingIndicator, hideLoadingIndicator, showNodeDetails, formatDate } from './ui.js';
 import { getTransactionRelationshipGraphStyle } from './utils.js';
 
 // Global variables
@@ -50,10 +50,18 @@ function setupTransactionRelationshipGraphEvents(graph) {
         const node = e.target;
         const nodeData = node.data();
 
-        if (nodeData.type === 'transaction') {
-            showTransactionNodeDetails(nodeData);
+        if (nodeData.type === 'transaction' || nodeData.type === 'main-transaction') {
+            // Use the shared showNodeDetails function for comprehensive transaction details
+            showNodeDetails({
+                type: nodeData.type,
+                ...nodeData
+            });
         } else if (nodeData.type === 'user') {
-            showUserNodeDetails(nodeData);
+            // Use the shared showNodeDetails function for comprehensive user details
+            showNodeDetails({
+                type: 'user',
+                ...nodeData
+            });
         }
     });
 
@@ -381,91 +389,9 @@ export function fitTransactionGraph() {
     }
 }
 
-// Function to show transaction node details
-function showTransactionNodeDetails(nodeData) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Transaction Details</h2>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Transaction ID:</span>
-                    <span class="detail-value">${nodeData.id}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Amount:</span>
-                    <span class="detail-value">$${nodeData.amount}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Description:</span>
-                    <span class="detail-value">${nodeData.description || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">IP Address:</span>
-                    <span class="detail-value">${nodeData.ipAddress || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Device ID:</span>
-                    <span class="detail-value">${nodeData.deviceId || 'N/A'}</span>
-                </div>
-            </div>
-        </div>
-    `;
 
-    // Add close functionality
-    const closeBtn = modal.querySelector('.close');
-    closeBtn.onclick = () => modal.remove();
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.remove();
-    };
 
-    document.body.appendChild(modal);
-}
 
-// Function to show user node details
-function showUserNodeDetails(nodeData) {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>User Details</h2>
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span class="detail-label">Name:</span>
-                    <span class="detail-value">${nodeData.label}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">User ID:</span>
-                    <span class="detail-value">${nodeData.id}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value">${nodeData.email || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Phone:</span>
-                    <span class="detail-value">${nodeData.phone || 'N/A'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Risk Level:</span>
-                    <span class="detail-value risk-badge ${nodeData.riskLevel || 'unknown'}">${nodeData.riskLevel || 'unknown'}</span>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Add close functionality
-    const closeBtn = modal.querySelector('.close');
-    closeBtn.onclick = () => modal.remove();
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.remove();
-    };
-
-    document.body.appendChild(modal);
-}
 
 // Function to show transaction relationship details
 function showTransactionRelationshipDetails(relationship, edgeData) {
