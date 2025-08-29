@@ -2,7 +2,7 @@ import express from 'express';
 import createContainer from './container.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;  // DigitalOcean App Platform uses 8080
 
 // Initialize database connection
 const initializeDatabase = async (container) => {

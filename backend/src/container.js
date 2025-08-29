@@ -69,9 +69,15 @@ export default function createContainer() {
 
     // PHASE 6: APPLICATION SETUP - Main application routes
     container.setupApiRoutes = (app) => {
-        // Middleware
+        // Middleware - CORS configuration
+        const allowedOrigins = [
+            'http://localhost:3001',
+            'http://localhost:5500',
+            process.env.CORS_ORIGIN  // Production frontend URL
+        ].filter(Boolean);  // Remove undefined values
+
         app.use(container.cors({
-            origin: ['http://localhost:3001', 'http://localhost:5500'],
+            origin: allowedOrigins,
             credentials: true
         }));
         app.use(container.express.json());

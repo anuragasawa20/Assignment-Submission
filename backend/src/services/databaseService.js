@@ -18,7 +18,10 @@ class DatabaseService {
                 // Neo4j connection configuration
                 const uri = process.env.NEO4J_URI || 'bolt://localhost:7687';
                 const username = process.env.NEO4J_USERNAME || 'neo4j';
-                const password = process.env.NEO4J_PASSWORD || 'password';
+                const password = process.env.NEO4J_PASSWORD || 'flagright123';
+
+                console.log(`🔗 Neo4j URI: ${uri}`);
+                console.log(`👤 Neo4j Username: ${username}`);
 
                 console.log(`Connecting to: ${uri}`);
 
