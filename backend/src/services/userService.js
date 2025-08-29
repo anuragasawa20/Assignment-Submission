@@ -124,23 +124,61 @@ export default class UserService {
     }
 
     async createSharedAttributeRelationship(userId, attributeType, attributeValue, relationshipType) {
-        const query = `
-            MATCH (u1:User {id: $userId})
-            MATCH (u2:User)
-            WHERE u2.${attributeType} = $attributeValue AND u2.id <> $userId
-            MERGE (u1)-[r:${relationshipType} {
-                attribute: $attributeType,
-                value: $attributeValue,
-                createdAt: datetime()
-            }]-(u2)
-            RETURN count(r) as relationshipsCreated
-        `;
+        let query;
 
-        await this.databaseService.runQuery(query, {
+        // Build the query with literal property names (Neo4j doesn't allow parameterized property names)
+        switch (attributeType) {
+            case 'email':
+                query = `
+                    MATCH (u1:User {id: $userId})
+                    MATCH (u2:User)
+                    WHERE u2.email = $attributeValue AND u2.id <> $userId
+                    MERGE (u1)-[r:${relationshipType} {
+                        attribute: $attributeType,
+                        value: $attributeValue,
+                        createdAt: datetime()
+                    }]-(u2)
+                    RETURN count(r) as relationshipsCreated
+                `;
+                break;
+            case 'phone':
+                query = `
+                    MATCH (u1:User {id: $userId})
+                    MATCH (u2:User)
+                    WHERE u2.phone = $attributeValue AND u2.id <> $userId
+                    MERGE (u1)-[r:${relationshipType} {
+                        attribute: $attributeType,
+                        value: $attributeValue,
+                        createdAt: datetime()
+                    }]-(u2)
+                    RETURN count(r) as relationshipsCreated
+                `;
+                break;
+            case 'address':
+                query = `
+                    MATCH (u1:User {id: $userId})
+                    MATCH (u2:User)
+                    WHERE u2.address = $attributeValue AND u2.id <> $userId
+                    MERGE (u1)-[r:${relationshipType} {
+                        attribute: $attributeType,
+                        value: $attributeValue,
+                        createdAt: datetime()
+                    }]-(u2)
+                    RETURN count(r) as relationshipsCreated
+                `;
+                break;
+            default:
+                console.warn(`Unknown attribute type: ${attributeType}`);
+                return;
+        }
+
+        const result = await this.databaseService.runQuery(query, {
             userId,
             attributeType,
             attributeValue
         });
+
+        console.log(`Created ${result.records[0]?.get('relationshipsCreated')?.toNumber() || 0} ${relationshipType} relationships for user ${userId}`);
     }
 
     async createSharedPaymentMethodRelationship(userId, paymentMethod) {

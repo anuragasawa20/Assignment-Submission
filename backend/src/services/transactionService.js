@@ -161,24 +161,48 @@ export default class TransactionService {
     }
 
     async createSharedAttributeTransactionRelationship(transactionId, attributeType, attributeValue, relationshipType) {
-        const query = `
-            MATCH (t1:Transaction {id: $transactionId})
-            MATCH (t2:Transaction)
-            WHERE t2.${attributeType} = $attributeValue AND t2.id <> $transactionId
-            MERGE (t1)-[r:${relationshipType} {
-                attribute: $attributeType,
-                value: $attributeValue,
-                createdAt: datetime()
-            }]-(t2)
-            RETURN count(r) as relationshipsCreated
-        `;
+        let query;
 
-        await this.databaseService.runQuery(query, {
+        // Build the query with literal property names (Neo4j doesn't allow parameterized property names)
+        switch (attributeType) {
+            case 'ipAddress':
+                query = `
+                    MATCH (t1:Transaction {id: $transactionId})
+                    MATCH (t2:Transaction)
+                    WHERE t2.ipAddress = $attributeValue AND t2.id <> $transactionId
+                    MERGE (t1)-[r:${relationshipType} {
+                        attribute: $attributeType,
+                        value: $attributeValue,
+                        createdAt: datetime()
+                    }]-(t2)
+                    RETURN count(r) as relationshipsCreated
+                `;
+                break;
+            case 'deviceId':
+                query = `
+                    MATCH (t1:Transaction {id: $transactionId})
+                    MATCH (t2:Transaction)
+                    WHERE t2.deviceId = $attributeValue AND t2.id <> $transactionId
+                    MERGE (t1)-[r:${relationshipType} {
+                        attribute: $attributeType,
+                        value: $attributeValue,
+                        createdAt: datetime()
+                    }]-(t2)
+                    RETURN count(r) as relationshipsCreated
+                `;
+                break;
+            default:
+                console.warn(`Unknown transaction attribute type: ${attributeType}`);
+                return;
+        }
+
+        const result = await this.databaseService.runQuery(query, {
             transactionId,
             attributeType,
-            attributeValue,
-            relationshipType
+            attributeValue
         });
+
+        console.log(`Created ${result.records[0]?.get('relationshipsCreated')?.toNumber() || 0} ${relationshipType} relationships for transaction ${transactionId}`);
     }
 
     async getTransactionRelationships(transactionId) {

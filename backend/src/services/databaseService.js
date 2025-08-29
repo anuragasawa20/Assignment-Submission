@@ -1,4 +1,6 @@
 import neo4j from 'neo4j-driver';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class DatabaseService {
     constructor() {

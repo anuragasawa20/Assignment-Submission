@@ -1,4 +1,6 @@
 import createContainer from '../container.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 class SampleDataGenerator {
     constructor(container) {
