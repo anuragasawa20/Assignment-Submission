@@ -452,6 +452,59 @@ export function formatDate(dateString) {
     }
 }
 
+// Data Management UI Functions
+export function updateDataManagementButtons() {
+    const loadSampleDataBtn = document.getElementById('loadSampleDataBtn');
+    const clearDataBtn = document.getElementById('clearDataBtn');
+
+    // Check if data exists using the hasData function
+    const dataExists = window.hasData && window.hasData();
+
+    if (dataExists) {
+        // Show clear data button, hide load sample data button
+        if (loadSampleDataBtn) loadSampleDataBtn.style.display = 'none';
+        if (clearDataBtn) clearDataBtn.style.display = 'inline-flex';
+    } else {
+        // Show load sample data button, hide clear data button
+        if (loadSampleDataBtn) loadSampleDataBtn.style.display = 'inline-flex';
+        if (clearDataBtn) clearDataBtn.style.display = 'none';
+    }
+}
+
+// Wrapper functions for data management
+async function loadSampleDataAndUpdate() {
+    if (window.loadSampleData) {
+        const success = await window.loadSampleData();
+        if (success) {
+            updateDataManagementButtons();
+            // Refresh the graph display
+            if (window.refreshGraph) {
+                await window.refreshGraph();
+            }
+        }
+    }
+}
+
+async function clearDataAndUpdate() {
+    // Show confirmation dialog
+    const confirmed = confirm('Are you sure you want to clear all data? This action cannot be undone.');
+    if (!confirmed) return;
+
+    if (window.clearData) {
+        const success = await window.clearData();
+        if (success) {
+            updateDataManagementButtons();
+            // Clear the graph display
+            if (window.resetGraph) {
+                window.resetGraph();
+            }
+        }
+    }
+}
+
 // Export functions for global access
 window.closeDetailModal = closeDetailModal;
 window.exportGraphData = exportGraphData;
+window.updateDataManagementButtons = updateDataManagementButtons;
+window.loadSampleDataAndUpdate = loadSampleDataAndUpdate;
+window.clearDataAndUpdate = clearDataAndUpdate;

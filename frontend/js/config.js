@@ -9,14 +9,14 @@ export const config = {
             const port = window.location.port;
 
             if (hostname === 'localhost' && port === '3001') {
-                // Local development - frontend on 3001, backend on 3000
-                return 'http://localhost:3000/';
-            } else if (hostname === 'localhost' && port === '3000') {
+                // Local development - frontend on 3001, backend on 8080
+                return 'https://assignment-backend-nrav9.ondigitalocean.app/';//'http://localhost:8080/';
+            } else if (hostname === 'localhost' && port === '8080') {
                 // Direct access to backend
-                return 'http://localhost:3000/';
+                return 'http://localhost:8080/';
             } else {
-                // Docker or production - use same hostname, backend on 3000
-                return `${window.location.protocol}//${hostname}:3000/`;
+                // Production - use DigitalOcean backend
+                return 'https://assignment-backend-nrav9.ondigitalocean.app/';
             }
         })(),
 

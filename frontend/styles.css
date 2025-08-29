@@ -473,6 +473,37 @@ body {
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
 }
 
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+/* Data Management Controls */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.data-management-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.data-management-controls .btn {
+    font-size: 0.9rem;
+    padding: 8px 16px;
+}
+
 /* Modal Styles */
 .modal {
     display: none;

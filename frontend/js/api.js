@@ -2,21 +2,12 @@
 import { displayUsers, displayTransactions, showMessage } from './ui.js';
 import { updateGraphWithSharedAttributes } from './graph-explorer.js';
 import { visualizeTransactionRelationships, updateRelationshipSummary, clearTransactionRelationships } from './graph-transactions.js';
+import { config, getApiUrl, getEnvironmentInfo } from './config.js';
 
-// API Base URL - automatically detect environment
-const API_BASE_URL = (() => {
-    const hostname = window.location.hostname;
-    const port = window.location.port;
+// API Base URL - use configuration system
+const API_BASE_URL = config.api.baseURL;
 
-    // If running in Docker (port 3001) or local dev (port 3001), backend is on 3000
-    if (port === '3001') {
-        return 'http://localhost:3000/';
-    }
-    // If accessing directly, backend might be on same port
-    else {
-        return `${window.location.protocol}//${hostname}:3000/`;
-    }
-})();
+console.log('🌐 API Configuration:', getEnvironmentInfo());
 
 // Global data storage
 export let users = [];
@@ -46,12 +37,17 @@ function hideLoadingIndicator() {
 // Users management
 export async function loadUsers() {
     try {
-        const response = await fetch(`${API_BASE_URL}users`);
+        const response = await fetch(getApiUrl(config.api.endpoints.users));
         if (response.ok) {
             const result = await response.json();
             users = result.data;
             window.users = users; // Update global scope
             displayUsers(users);
+
+            // Update data management buttons
+            if (window.updateDataManagementButtons) {
+                window.updateDataManagementButtons();
+            }
         } else {
             throw new Error('Failed to load users');
         }
@@ -66,7 +62,7 @@ export async function loadUsers() {
 // Function to fetch user relationships from API
 export async function loadUserRelationships(userId) {
     try {
-        const response = await fetch(`${API_BASE_URL}relationships/user/${userId}`);
+        const response = await fetch(getApiUrl(`${config.api.endpoints.relationships}/user/${userId}`));
         if (!response.ok) {
             if (response.status === 404) {
                 console.warn(`No relationships found for user ${userId}`);
@@ -98,12 +94,17 @@ export async function loadUserRelationships(userId) {
 // Transactions management
 export async function loadTransactions() {
     try {
-        const response = await fetch(`${API_BASE_URL}transactions`);
+        const response = await fetch(getApiUrl(config.api.endpoints.transactions));
         if (response.ok) {
             const result = await response.json();
             transactions = result.data;
             window.transactions = transactions; // Update global scope
             displayTransactions(transactions);
+
+            // Update data management buttons
+            if (window.updateDataManagementButtons) {
+                window.updateDataManagementButtons();
+            }
         } else {
             throw new Error('Failed to load transactions');
         }
@@ -118,7 +119,7 @@ export async function loadTransactions() {
 // Transaction Relationships API Call
 export async function loadTransactionRelationships(transactionId) {
     try {
-        const response = await fetch(`${API_BASE_URL}relationships/transaction/${transactionId}`);
+        const response = await fetch(getApiUrl(`${config.api.endpoints.relationships}/transaction/${transactionId}`));
         if (response.ok) {
             const result = await response.json();
             showTransactionRelationships(result.data);
@@ -141,7 +142,7 @@ export async function loadTransactionRelationshipsFromInput() {
 
     try {
         showLoadingIndicator('Loading transaction relationships...');
-        const response = await fetch(`${API_BASE_URL}relationships/transaction/${transactionId}`);
+        const response = await fetch(getApiUrl(`${config.api.endpoints.relationships}/transaction/${transactionId}`));
 
         if (response.ok) {
             const result = await response.json();
@@ -342,10 +343,92 @@ function generateTransactionRelationshipDetails(data) {
     `;
 }
 
+// Data management functions
+export async function loadSampleData() {
+    try {
+        showLoadingIndicator('Loading sample data...');
+        const response = await fetch(getApiUrl(config.api.endpoints.sampleData), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            showMessage('Sample data loaded successfully!', 'success');
+            // Reload data after loading sample data
+            await loadUsers();
+            await loadTransactions();
+            return true;
+        } else {
+            throw new Error('Failed to load sample data');
+        }
+    } catch (error) {
+        console.error('Error loading sample data:', error);
+        showMessage('Error loading sample data', 'error');
+        return false;
+    } finally {
+        hideLoadingIndicator();
+    }
+}
+
+export async function clearData() {
+    try {
+        showLoadingIndicator('Clearing data...');
+        const response = await fetch(getApiUrl(config.api.endpoints.clearData), {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            showMessage('Data cleared successfully!', 'success');
+            // Clear local data
+            users.length = 0;
+            transactions.length = 0;
+            Object.keys(userRelationships).forEach(key => delete userRelationships[key]);
+
+            // Update global scope
+            window.users = users;
+            window.transactions = transactions;
+            window.userRelationships = userRelationships;
+
+            // Update displays
+            displayUsers([]);
+            displayTransactions([]);
+
+            // Update data management buttons
+            if (window.updateDataManagementButtons) {
+                window.updateDataManagementButtons();
+            }
+
+            return true;
+        } else {
+            throw new Error('Failed to clear data');
+        }
+    } catch (error) {
+        console.error('Error clearing data:', error);
+        showMessage('Error clearing data', 'error');
+        return false;
+    } finally {
+        hideLoadingIndicator();
+    }
+}
+
+export function hasData() {
+    return users.length > 0 || transactions.length > 0;
+}
+
 // Export functions for global access
 window.loadUserRelationships = loadUserRelationships;
 window.loadTransactionRelationships = loadTransactionRelationships;
 window.loadTransactionRelationshipsFromInput = loadTransactionRelationshipsFromInput;
+window.loadSampleData = loadSampleData;
+window.clearData = clearData;
+window.hasData = hasData;
 
 // Export data to global scope for export functions
 window.users = users;

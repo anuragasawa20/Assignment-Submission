@@ -1,5 +1,5 @@
 // Main entry point for the Flagright Relationship Visualizer
-import { initializeNavigation, showSection } from './ui.js';
+import { initializeNavigation, showSection, updateDataManagementButtons } from './ui.js';
 import { initializeGraph } from './graph-explorer.js';
 import { initializeTransactionGraph } from './graph-transactions.js';
 import { loadUsers, loadTransactions } from './api.js';
@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
     }
+
+    // Initialize data management buttons based on current data state
+    updateDataManagementButtons();
 
     console.log('✅ Frontend initialization complete');
 });
