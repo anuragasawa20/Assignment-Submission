@@ -1,5 +1,9 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import createContainer from './container.js';
+
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8080;  // DigitalOcean App Platform uses 8080
